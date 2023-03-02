@@ -55,6 +55,12 @@ const hdPrivateKey1 = code.getHDPrivateKey();
 const words = Mnemonic.words('english');
 ```
 
+## Get seed without using Mnemonic class
+
+```javascript
+const phrase = Mnemonic.generateMnemonic('english');
+```
+
 ## Generate Addresses
 
 ```javascript
