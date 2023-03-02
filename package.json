@@ -1,0 +1,70 @@
+{
+  "version": "1.0.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "lint:fix": "tsdx lint --fix",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "name": "@hyperbitjs/mnemonic",
+  "author": "Hyperbit",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyperbit-dev/mnemonic",
+    "directory": "packages/mnemonic"
+  },
+  "module": "dist/mnemonic.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/mnemonic.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/mnemonic.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^7.0.8",
+    "@types/hdkey": "^2.0.1",
+    "husky": "^7.0.4",
+    "size-limit": "^7.0.8",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.6.3"
+  },
+  "dependencies": {
+    "@hyperbitjs/chains": "^0.3.1",
+    "bip39": "^3.0.4",
+    "coinkey": "^3.0.0",
+    "hdkey": "^2.0.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
