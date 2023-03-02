@@ -1,4 +1,4 @@
-![Hyperbit Mnemonic Banner](https://github.com/Hyperbits/mnemonic/raw/main/media/repo-banner.png)
+![Hyperbit Mnemonic Banner](https://github.com/hyperbit-dev/mnemonic/raw/main/media/repo-banner.png)
 
 # Hyperbit - Mnemonic
 
