@@ -60,6 +60,13 @@ export class Mnemonic {
     }
   }
 
+  static generateMnemonic(language?: Language) {
+    if (language) {
+      bip39.setDefaultWordlist(language);
+    }
+    return bip39.generateMnemonic();
+  }
+
   public getHDPrivateKey(): HDKey {
     return this._hdKey;
   }
