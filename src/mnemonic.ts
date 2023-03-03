@@ -35,7 +35,8 @@ export class Mnemonic {
     }
 
     this.mnemonic = options.mnemonic || bip39.generateMnemonic();
-    this._defaultAcount = options.account || 0;
+    this._defaultAcount =
+      typeof options.account === 'number' ? Math.abs(options.account) : 0;
     this._passphrase = options.passphrase;
 
     this.seed = this.toSeed({
@@ -132,14 +133,17 @@ export class Mnemonic {
   public generateAddresses(params: GenerateAddresses): GenerateAddressSet[] {
     const _index =
       typeof params?.index === 'number' ? Math.abs(params.index) : 0;
+
     const _count =
       typeof params?.count === 'number' && params.count > 0
         ? Math.abs(params.count) + _index
         : 1 + _index;
+
     const _defaultAcount =
       typeof params?.account === 'number'
         ? Math.abs(params.account)
         : this._defaultAcount;
+
     const _account = this.accounts[_defaultAcount];
 
     const addressPairs = [];
@@ -161,8 +165,8 @@ export class Mnemonic {
         continue;
       }
 
-      const recievePath = `m/44'/${coinType}'/${_account}'/0/${i}`;
-      const changePath = `m/44'/${coinType}'/${_account}'/1/${i}`;
+      const recievePath = `m/44'/${coinType}'/${_defaultAcount}'/0/${i}`;
+      const changePath = `m/44'/${coinType}'/${_defaultAcount}'/1/${i}`;
 
       const external = this.generateAddress(recievePath);
       const change = this.generateAddress(changePath);
