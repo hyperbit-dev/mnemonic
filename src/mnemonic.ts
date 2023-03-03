@@ -130,9 +130,16 @@ export class Mnemonic {
    * @return {GenerateAddressSet}
    */
   public generateAddresses(params: GenerateAddresses): GenerateAddressSet[] {
-    const _index = params?.index || 0;
-    const _count = params?.count || 1;
-    const _defaultAcount = params?.account || this._defaultAcount;
+    const _index =
+      typeof params?.index === 'number' ? Math.abs(params.index) : 0;
+    const _count =
+      typeof params?.count === 'number' && params.count > 0
+        ? Math.abs(params.count) + _index
+        : 1 + _index;
+    const _defaultAcount =
+      typeof params?.account === 'number'
+        ? Math.abs(params.account)
+        : this._defaultAcount;
     const _account = this.accounts[_defaultAcount];
 
     const addressPairs = [];
