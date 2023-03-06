@@ -72,11 +72,11 @@ export class Mnemonic {
     return this._hdKey;
   }
 
-  public toHDPrivateKey(): HDKey {
-    const seed = this.toHexString(bip39.mnemonicToSeedSync(this.mnemonic));
+  public toHDPrivateKey(seed?: Buffer): HDKey {
+    const _seed = this.toHexString(seed || this.seed);
 
     const hDPrivateKey = HDKey.fromMasterSeed(
-      Buffer.from(seed, 'hex'),
+      Buffer.from(_seed, 'hex'),
       this.network.versions.bip32
     );
 
