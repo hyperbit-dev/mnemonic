@@ -15,11 +15,12 @@ import {
 export class Mnemonic {
   private _defaultAcount: number = 0;
   private _hdKey: HDKey;
+  private _coinKey: CoinKey;
   private _passphrase?: string;
 
   public mnemonic: string;
   public network: Network;
-  public seed?: Buffer;
+  public seed: Buffer;
   public words: string[];
   public accounts: Record<string, Record<string, Map<number, Address>>> = {
     0: {
@@ -48,6 +49,7 @@ export class Mnemonic {
     Mnemonic.isValid(this.mnemonic);
 
     this._hdKey = this.toHDPrivateKey();
+    this._coinKey = new CoinKey(this._hdKey.privateKey, this.network.versions);
   }
 
   public toSeed(options: ToSeedOptions): Buffer {
@@ -70,6 +72,10 @@ export class Mnemonic {
 
   public getHDPrivateKey(): HDKey {
     return this._hdKey;
+  }
+
+  public getCoinKey(): CoinKey {
+    return this._coinKey;
   }
 
   public toHDPrivateKey(seed?: Buffer): HDKey {
