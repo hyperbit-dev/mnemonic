@@ -22,7 +22,7 @@ code.toString();
 ```javascript
 import { ltc } from '@hyperbitjs/chains';
 
-const code = new Mnemonic({ network: ltc.main });
+const code = new Mnemonic({ network: ltc.mainnet });
 code.toString();
 ```
 

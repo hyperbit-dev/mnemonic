@@ -1,4 +1,4 @@
-import { btc, Network } from '@hyperbitjs/chains';
+import { btc, MainNet, TestNet, RegTest, SimNet } from '@hyperbitjs/chains';
 import * as bip39 from 'bip39';
 import CoinKey from 'coinkey';
 import HDKey from 'hdkey';
@@ -19,7 +19,7 @@ export class Mnemonic {
   private _passphrase?: string;
 
   public mnemonic: string;
-  public network: Network;
+  public network: MainNet | TestNet | RegTest | SimNet;
   public seed: Buffer;
   public words: string[];
   public accounts: Record<string, Record<string, Map<number, Address>>> = {
@@ -30,7 +30,7 @@ export class Mnemonic {
   };
 
   constructor(options: Options = {}) {
-    this.network = options.network || btc.main;
+    this.network = options.network || btc.mainnet;
     if (options.language) {
       bip39.setDefaultWordlist(options.language);
     }
