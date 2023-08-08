@@ -1,4 +1,4 @@
-import { Network } from '@hyperbitjs/chains';
+import { MainNet, TestNet, RegTest, SimNet } from '@hyperbitjs/chains';
 
 export type Language =
   | 'chinese_simplified'
@@ -23,9 +23,9 @@ export type Options = {
    * Network object cotaining information about the blockchain. See [@hyperbitjs/chains](https://github.com/hyperbit-dev/chains).
    * @example
    * import { btc } from '@hyperbitjs/chains';
-   * new Mnemonic({network: btc.main});
+   * new Mnemonic({network: btc.mainnet});
    */
-  network?: Network;
+  network?: MainNet | TestNet | RegTest | SimNet;
   /**
    * Additional word/string to securely your mnemonic string.
    */

@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "2.0.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -59,7 +59,7 @@
     "typescript": "^4.6.3"
   },
   "dependencies": {
-    "@hyperbitjs/chains": "^0.3.1",
+    "@hyperbitjs/chains": "^1.0.0",
     "bip39": "^3.0.4",
     "coinkey": "^3.0.0",
     "hdkey": "^2.0.1"
