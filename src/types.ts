@@ -1,5 +1,18 @@
 import { MainNet, TestNet, RegTest, SimNet } from '@hyperbitjs/chains';
 
+export const languages: Record<Language, { name: string; label: string }> = {
+  chinese_simplified: { name: 'Chinese Simplified', label: '简体中文' },
+  english: { name: 'English', label: 'English' },
+  japanese: { name: 'Japanese', label: '日本語' },
+  spanish: { name: 'Spanish', label: 'Español' },
+  italian: { name: 'Italian', label: 'Italiano' },
+  french: { name: 'French', label: 'Français' },
+  korean: { name: 'Korean', label: '한국어' },
+  czech: { name: 'Czech', label: 'Čeština' },
+  portuguese: { name: 'Portuguese', label: 'Português' },
+  chinese_traditional: { name: 'Chinese Traditional', label: '繁體中文' },
+};
+
 export type Language =
   | 'chinese_simplified'
   | 'english'

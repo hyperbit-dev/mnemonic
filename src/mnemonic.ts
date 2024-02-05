@@ -1,7 +1,7 @@
-import { btc, MainNet, TestNet, RegTest, SimNet } from '@hyperbitjs/chains';
-import * as bip39 from 'bip39';
-import CoinKey from 'coinkey';
-import HDKey from 'hdkey';
+import { btc, MainNet, TestNet, RegTest, SimNet } from "@hyperbitjs/chains";
+import * as bip39 from "bip39";
+import CoinKey from "coinkey";
+import HDKey from "hdkey";
 
 import {
   GenerateAddresses,
@@ -10,7 +10,7 @@ import {
   Options,
   ToSeedOptions,
   Language,
-} from './types';
+} from "./types";
 
 export class Mnemonic {
   private _defaultAcount: number = 0;
@@ -30,21 +30,21 @@ export class Mnemonic {
   };
 
   constructor(options: Options = {}) {
-    this.network = options.network || btc.mainnet;
+    this.network = options?.network ?? btc.mainnet;
     if (options.language) {
       bip39.setDefaultWordlist(options.language);
     }
 
     this.mnemonic = options.mnemonic || bip39.generateMnemonic();
     this._defaultAcount =
-      typeof options.account === 'number' ? Math.abs(options.account) : 0;
+      typeof options.account === "number" ? Math.abs(options.account) : 0;
     this._passphrase = options.passphrase;
 
     this.seed = this.toSeed({
       mnemonic: this.mnemonic,
       passphrase: this._passphrase,
     });
-    this.words = this.mnemonic.split(' ');
+    this.words = this.mnemonic.split(" ");
 
     Mnemonic.isValid(this.mnemonic);
 
@@ -59,7 +59,7 @@ export class Mnemonic {
       this.seed = bip39.mnemonicToSeedSync(mn, p);
       return this.seed;
     } else {
-      throw new Error('Invalid arguments: mnemonic');
+      throw new Error("Invalid arguments: mnemonic");
     }
   }
 
@@ -82,7 +82,7 @@ export class Mnemonic {
     const _seed = this.toHexString(seed || this.seed);
 
     const hDPrivateKey = HDKey.fromMasterSeed(
-      Buffer.from(_seed, 'hex'),
+      Buffer.from(_seed, "hex"),
       this.network.versions.bip32
     );
 
@@ -99,9 +99,9 @@ export class Mnemonic {
 
   public toHexString(seed?: Buffer): string {
     if (!seed) {
-      throw new Error('Seed Buffer not provided');
+      throw new Error("Seed Buffer not provided");
     }
-    return seed.toString('hex');
+    return seed.toString("hex");
   }
 
   /**
@@ -112,7 +112,7 @@ export class Mnemonic {
    */
   static isValid(mnemonic?: string, wordlist?: string[]): boolean {
     if (!mnemonic) {
-      throw new Error('Mnemonic not provided');
+      throw new Error("Mnemonic not provided");
     }
     return bip39.validateMnemonic(mnemonic, wordlist);
   }
@@ -134,19 +134,20 @@ export class Mnemonic {
    * If index is defined, it is expected that the user wants to generate or retrieve an existing addresses information.
    * @param {number=} count Amount of addresses to generate starting from zero or index.
    * @param {number=} index Address index to generate.
+   * @param {number=} account Default = 1. Set Account to generate addresses for.
    * @return {GenerateAddressSet}
    */
   public generateAddresses(params: GenerateAddresses): GenerateAddressSet[] {
     const _index =
-      typeof params?.index === 'number' ? Math.abs(params.index) : 0;
+      typeof params?.index === "number" ? Math.abs(params.index) : 0;
 
     const _count =
-      typeof params?.count === 'number' && params.count > 0
+      typeof params?.count === "number" && params.count > 0
         ? Math.abs(params.count) + _index
         : 1 + _index;
 
     const _defaultAcount =
-      typeof params?.account === 'number'
+      typeof params?.account === "number"
         ? Math.abs(params.account)
         : this._defaultAcount;
 
@@ -214,7 +215,7 @@ export class Mnemonic {
     const ck = new CoinKey(derived.privateKey, this.network.versions);
 
     return {
-      privateKey: ck.privateKey.toString('hex'),
+      privateKey: ck.privateKey.toString("hex"),
       address: ck.publicAddress,
       path,
       wif: ck.privateWif,
