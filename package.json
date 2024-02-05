@@ -65,5 +65,9 @@
     "bip39": "^3.1.0",
     "coinkey": "^3.0.0",
     "hdkey": "^2.1.0"
+  },
+  "overrides": {
+    "deep-extend": "^0.5.1",
+    "minimist": "^1.2.3"
   }
 }
