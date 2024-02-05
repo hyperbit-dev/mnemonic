@@ -1,6 +1,5 @@
-import { Mnemonic } from './mnemonic';
+import { Mnemonic } from "./mnemonic";
 
-export * from './mnemonic';
-export * from './types';
+export * from "./types";
 
 export default Mnemonic;

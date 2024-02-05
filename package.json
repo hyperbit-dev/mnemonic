@@ -1,70 +1,68 @@
 {
-  "version": "2.0.0",
-  "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "src"
-  ],
-  "engines": {
-    "node": ">=10"
-  },
-  "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "lint:fix": "tsdx lint --fix",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
   "name": "@hyperbitjs/mnemonic",
-  "author": "Hyperbit",
+  "version": "2.0.0",
+  "type": "module",
+  "author": "Hyperbit <support@hyperbit.app>",
+  "license": "MIT",
+  "homepage": "https://github.com/hyperbit-dev/mnemonic#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hyperbit-dev/mnemonic",
-    "directory": "packages/mnemonic"
+    "url": "git+https://github.com/hyperbit-dev/mnemonic.git"
   },
-  "module": "dist/mnemonic.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/mnemonic.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/mnemonic.esm.js",
-      "limit": "10 KB"
+  "bugs": "https://github.com/hyperbit-dev/mnemonic/issues",
+  "keywords": [],
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
   ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix",
+    "prepublishOnly": "nr build",
+    "release": "bumpp && npm publish",
+    "start": "esno src/index.ts",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^7.0.8",
-    "@types/hdkey": "^2.0.1",
-    "husky": "^7.0.4",
-    "size-limit": "^7.0.8",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.3.1",
-    "typescript": "^4.6.3"
+    "@types/hdkey": "^2.0.3",
+    "@types/node": "^20.11.16",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "bumpp": "^9.2.1",
+    "eslint": "^8.56.0",
+    "esno": "^4.0.0",
+    "pnpm": "^8.15.1",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3",
+    "unbuild": "^2.0.0",
+    "vite": "^5.0.11",
+    "vitest": "^1.1.3"
   },
   "dependencies": {
-    "@hyperbitjs/chains": "^1.0.0",
-    "bip39": "^3.0.4",
+    "@hyperbitjs/chains": "^1.4.0",
+    "bip39": "^3.1.0",
     "coinkey": "^3.0.0",
-    "hdkey": "^2.0.1"
-  },
-  "publishConfig": {
-    "access": "public"
+    "hdkey": "^2.1.0"
   }
 }
