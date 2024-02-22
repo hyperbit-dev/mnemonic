@@ -63,7 +63,7 @@
     "@hyperbitjs/chains": "^1.4.0",
     "bip39": "^3.1.0",
     "coinkey": "^3.0.0",
-    "hdkey": "^2.1.0"
+    "@hyperbitjs/hdkey": "^0.0.1"
   },
   "overrides": {
     "deep-extend": "^0.5.1",

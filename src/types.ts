@@ -48,6 +48,7 @@ export type Options = {
    */
   language?: Language;
   /**
+   * @deprecated
    * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account
    * Default = 0 for discoverying all wallet addresses starting from the root.
    */
