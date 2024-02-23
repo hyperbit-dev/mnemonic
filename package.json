@@ -62,7 +62,7 @@
   "dependencies": {
     "@hyperbitjs/chains": "^1.4.0",
     "bip39": "^3.1.0",
-    "coinkey": "^3.0.0",
+    "@hyperbitjs/coinkey": "^0.0.2",
     "@hyperbitjs/hdkey": "^0.0.1"
   },
   "overrides": {
