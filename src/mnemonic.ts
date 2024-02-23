@@ -1,6 +1,6 @@
 import { btc, MainNet, TestNet, RegTest, SimNet } from "@hyperbitjs/chains";
 import * as bip39 from "bip39";
-import CoinKey from "coinkey";
+import CoinKey from "@hyperbitjs/coinkey";
 import HDKey from "@hyperbitjs/hdkey";
 
 import {

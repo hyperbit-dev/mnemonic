@@ -1,3 +1,4 @@
+declare module '@hyperbitjs/coinkey';
 declare module '@hyperbitjs/hdkey';
 declare module 'bip39';
 declare module 'coinkey';
