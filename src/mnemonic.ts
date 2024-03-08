@@ -1,7 +1,8 @@
 import { btc, MainNet, TestNet, RegTest, SimNet } from "@hyperbitjs/chains";
-import * as bip39 from "bip39";
 import CoinKey from "@hyperbitjs/coinkey";
 import HDKey from "@hyperbitjs/hdkey";
+import { encrypt, decrypt } from "@metamask/browser-passworder";
+import * as bip39 from "bip39";
 
 import {
   GenerateAddresses,
@@ -10,57 +11,48 @@ import {
   Options,
   ToSeedOptions,
   Language,
+  Inspect,
 } from "./types";
 
 export class Mnemonic {
-  private _defaultAcount: number = 0;
   private _hdKey: typeof HDKey;
   private _coinKey: CoinKey;
   private _passphrase?: string;
 
-  public mnemonic: string;
-  public network: MainNet | TestNet | RegTest | SimNet;
-  public seed: Buffer;
-  public words: string[];
-  /**
-   * @deprecated
-   */
-  public accounts: Record<string, Record<string, Map<number, Address>>> = {
-    0: {
-      external: new Map(),
-      change: new Map(),
-    },
-  };
+  private _mnemonic: string;
+  private _language: Language;
+  private _network: MainNet | TestNet | RegTest | SimNet;
+  private _seed?: Buffer;
+  private _words: string | string[];
+  public encypted: boolean = false;
 
   constructor(options: Options = {}) {
-    this.network = options?.network ?? btc.mainnet;
-    if (options.language) {
-      bip39.setDefaultWordlist(options.language);
-    }
+    this._network = options?.network ?? btc.mainnet;
+    this._language = options.language ?? "english";
 
-    this.mnemonic = options.mnemonic || bip39.generateMnemonic();
-    this._defaultAcount =
-      typeof options.account === "number" ? Math.abs(options.account) : 0;
+    bip39.setDefaultWordlist(this._language);
+
+    this._mnemonic = options.mnemonic || bip39.generateMnemonic();
     this._passphrase = options.passphrase;
 
-    this.seed = this.toSeed({
-      mnemonic: this.mnemonic,
+    this._seed = this.toSeed({
+      mnemonic: this._mnemonic,
       passphrase: this._passphrase,
     });
-    this.words = this.mnemonic.split(" ");
+    this._words = this._mnemonic.split(" ");
 
-    Mnemonic.isValid(this.mnemonic);
+    this.isValid();
 
     this._hdKey = this.toHDPrivateKey();
-    this._coinKey = new CoinKey(this._hdKey.privateKey, this.network.versions);
+    this._coinKey = new CoinKey(this._hdKey.privateKey, this._network.versions);
   }
 
   public toSeed(options: ToSeedOptions): Buffer {
-    const mn = options.mnemonic || this.mnemonic;
+    const mn = options.mnemonic || this._mnemonic;
     const p = options.passphrase || this._passphrase;
     if (mn) {
-      this.seed = bip39.mnemonicToSeedSync(mn, p);
-      return this.seed;
+      this._seed = bip39.mnemonicToSeedSync(mn, p);
+      return this._seed!;
     } else {
       throw new Error("Invalid arguments: mnemonic");
     }
@@ -81,12 +73,12 @@ export class Mnemonic {
     return this._coinKey;
   }
 
-  public toHDPrivateKey(seed?: Buffer): typeof HDKey {
-    const _seed = this.toHexString(seed || this.seed);
+  public toHDPrivateKey(): typeof HDKey {
+    const _seed = this.toHexString();
 
     const hDPrivateKey = HDKey.fromMasterSeed(
       Buffer.from(_seed, "hex"),
-      this.network.versions.bip32
+      this._network.versions.bip32
     );
 
     return hDPrivateKey;
@@ -97,14 +89,14 @@ export class Mnemonic {
    * @returns string
    */
   public toString(): string {
-    return this.mnemonic;
+    return this._mnemonic;
   }
 
-  public toHexString(seed?: Buffer): string {
-    if (!seed) {
-      throw new Error("Seed Buffer not provided");
+  public toHexString(): string {
+    if (!this._seed) {
+      throw new Error("Seed not available or encrypted");
     }
-    return seed.toString("hex");
+    return this._seed.toString("hex");
   }
 
   /**
@@ -113,29 +105,68 @@ export class Mnemonic {
    * @param {Array<string>=} wordlist A list of words to validate against
    * @returns boolean
    */
-  static isValid(mnemonic?: string, wordlist?: string[]): boolean {
-    if (!mnemonic) {
+  public isValid(): boolean {
+    if (!this._mnemonic) {
       throw new Error("Mnemonic not provided");
     }
-    return bip39.validateMnemonic(mnemonic, wordlist);
-  }
-
-  public inspect(): Record<string, string | Buffer | undefined> {
-    return {
-      mnemonic: this.mnemonic,
-      seed: this.seed,
-      hexString: this.toHexString(this.seed),
-      entropy: bip39.mnemonicToEntropy(this.mnemonic as string),
-    };
+    const wordlist = Mnemonic.words(this._language);
+    return bip39.validateMnemonic(this._mnemonic, wordlist);
   }
 
   /**
-   * @deprecated
-   * Generate and store a external and change address for the submitted index.
+   * Deep cloned object of the wallet.
+   */
+  public inspect(): Inspect {
+    return structuredClone({
+      hdKey: this._hdKey,
+      coinKey: this._coinKey,
+      passphrase: this._passphrase,
+      mnemonic: this._mnemonic,
+      network: this._network,
+      seed: this._seed,
+      words: this._words,
+      hexString: !this.encypted ? this.toHexString() : undefined,
+      // entropy: !this.encypted
+      //   ? bip39.mnemonicToEntropy(this._mnemonic as string)
+      //   : undefined,
+      encrypted: this.encypted,
+    });
+  }
+
+  public async encrypt(passphrase?: string) {
+    const p = passphrase || "";
+    this._hdKey = await encrypt(p, this._hdKey);
+    this._coinKey = await encrypt(p, this._coinKey);
+    if (this._passphrase) {
+      this._passphrase = await encrypt(p, this._passphrase);
+    }
+    this._mnemonic = await encrypt(p, this._mnemonic);
+    this._seed = this._seed = undefined;
+    this._words = await encrypt(p, this._words);
+    this.encypted = true;
+  }
+
+  public async decrypt(passphrase?: string) {
+    const p = passphrase || "";
+    this._coinKey = await decrypt(p, this._coinKey);
+    if (this._passphrase) {
+      this._passphrase = (await decrypt(p, this._passphrase)) as string;
+    }
+    this._mnemonic = (await decrypt(p, this._mnemonic)) as string;
+    this._seed = this.toSeed({
+      mnemonic: this._mnemonic,
+      passphrase: this._passphrase,
+    });
+    if (this._words) {
+      this._words = (await decrypt(p, this._words as string)) as string[];
+    }
+    this._hdKey = this.toHDPrivateKey();
+    this.encypted = false;
+  }
+
+  /**
+   * Generate external and change addresses for the submitted index.
    *
-   * If not specified, index will be autogenerated from the last highest index.
-   *
-   * If index is defined, it is expected that the user wants to generate or retrieve an existing addresses information.
    * @param {number=} count Amount of addresses to generate starting from zero or index.
    * @param {number=} index Address index to generate.
    * @param {number=} account Default = 0. Set Account to generate addresses for.
@@ -151,46 +182,19 @@ export class Mnemonic {
         : 1 + _index;
 
     const _defaultAcount =
-      typeof params?.account === "number"
-        ? Math.abs(params.account)
-        : this._defaultAcount;
-
-    const _account = this.accounts[_defaultAcount];
+      typeof params?.account === "number" ? Math.abs(params.account) : 0;
 
     const addressPairs = [];
 
-    // Get sorted external addresses.
-    const externalAddresses = Array.from(_account.external).sort(
-      (a, b) => a[0] - b[0]
-    );
-
     // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-    const coinType = this.network.versions.bip44;
+    const coinType = this._network.versions.bip44;
 
     for (let i = _index; i < _count; i++) {
-      // Find last external address and its' index.
-      const lastReceiveAddress =
-        externalAddresses[externalAddresses.length - 1];
-      const lastIndex = lastReceiveAddress?.[i];
-      if (lastIndex !== undefined) {
-        continue;
-      }
-
       const recievePath = `m/44'/${coinType}'/${_defaultAcount}'/0/${i}`;
-      const changePath = `m/44'/${coinType}'/${_defaultAcount}'/1/${i}`;
-
       const external = this.generateAddress(recievePath);
+
+      const changePath = `m/44'/${coinType}'/${_defaultAcount}'/1/${i}`;
       const change = this.generateAddress(changePath);
-
-      const mappedReceiveAddress = _account.external.get(i);
-      if (!mappedReceiveAddress) {
-        _account.external.set(i, external);
-      }
-
-      const mappedChangeAddress = _account.change.get(i);
-      if (!mappedChangeAddress) {
-        _account.change.set(i, change);
-      }
 
       addressPairs.push({
         external,
@@ -202,10 +206,8 @@ export class Mnemonic {
   }
 
   /**
-   * @deprecated
    * Generate a single address for external or change.
    *
-   * Is not automatically stored in the class.
    * @example
    * // First Wallet Receive Address
    * mnemonic.generateAddress('`m/44'/1'/0'/0/0`)
@@ -217,11 +219,13 @@ export class Mnemonic {
    */
   public generateAddress(path: string): Address {
     const derived = this._hdKey.derive(path);
-    const ck = new CoinKey(derived.privateKey, this.network.versions);
+    const ck = new CoinKey(derived.privateKey, this._network.versions);
 
     return {
       privateKey: ck.privateKey.toString("hex"),
+      publicKey: ck.publicKey.toString("hex"),
       address: ck.publicAddress,
+      compressed: ck.compressed,
       path,
       wif: ck.privateWif,
     };
