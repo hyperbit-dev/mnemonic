@@ -1,29 +1,31 @@
-import { MainNet, TestNet, RegTest, SimNet } from '@hyperbitjs/chains';
+import { MainNet, TestNet, RegTest, SimNet } from "@hyperbitjs/chains";
+import CoinKey from "@hyperbitjs/coinkey";
+import HDKey from "@hyperbitjs/hdkey";
 
 export const languages: Record<Language, { name: string; label: string }> = {
-  chinese_simplified: { name: 'Chinese Simplified', label: '简体中文' },
-  english: { name: 'English', label: 'English' },
-  japanese: { name: 'Japanese', label: '日本語' },
-  spanish: { name: 'Spanish', label: 'Español' },
-  italian: { name: 'Italian', label: 'Italiano' },
-  french: { name: 'French', label: 'Français' },
-  korean: { name: 'Korean', label: '한국어' },
-  czech: { name: 'Czech', label: 'Čeština' },
-  portuguese: { name: 'Portuguese', label: 'Português' },
-  chinese_traditional: { name: 'Chinese Traditional', label: '繁體中文' },
+  chinese_simplified: { name: "Chinese Simplified", label: "简体中文" },
+  english: { name: "English", label: "English" },
+  japanese: { name: "Japanese", label: "日本語" },
+  spanish: { name: "Spanish", label: "Español" },
+  italian: { name: "Italian", label: "Italiano" },
+  french: { name: "French", label: "Français" },
+  korean: { name: "Korean", label: "한국어" },
+  czech: { name: "Czech", label: "Čeština" },
+  portuguese: { name: "Portuguese", label: "Português" },
+  chinese_traditional: { name: "Chinese Traditional", label: "繁體中文" },
 };
 
 export type Language =
-  | 'chinese_simplified'
-  | 'english'
-  | 'japanese'
-  | 'spanish'
-  | 'italian'
-  | 'french'
-  | 'korean'
-  | 'czech'
-  | 'portuguese'
-  | 'chinese_traditional';
+  | "chinese_simplified"
+  | "english"
+  | "japanese"
+  | "spanish"
+  | "italian"
+  | "french"
+  | "korean"
+  | "czech"
+  | "portuguese"
+  | "chinese_traditional";
 
 export type Options = {
   /**
@@ -73,7 +75,22 @@ export type GenerateAddressSet = {
 
 export type Address = {
   privateKey: string;
+  publicKey: string;
   address: string;
+  compressed: boolean;
   path: string;
   wif: string;
+};
+
+export type Inspect = {
+  hdKey: typeof HDKey;
+  coinKey: CoinKey;
+  passphrase?: string;
+  mnemonic: string;
+  network: MainNet | TestNet | RegTest | SimNet;
+  seed?: Buffer;
+  words: string | string[];
+  hexString?: string;
+  entropy?: string;
+  encrypted: boolean;
 };
