@@ -48,6 +48,9 @@ export class Mnemonic {
   }
 
   public toSeed(options: ToSeedOptions): Buffer {
+    if (this.encypted) {
+      throw new Error("Locked. Please unlock to continue.");
+    }
     const mn = options.mnemonic || this._mnemonic;
     const p = options.passphrase || this._passphrase;
     if (mn) {
@@ -66,14 +69,23 @@ export class Mnemonic {
   }
 
   public getHDPrivateKey(): typeof HDKey {
+    if (this.encypted) {
+      throw new Error("Locked. Please unlock to continue.");
+    }
     return this._hdKey;
   }
 
   public getCoinKey(): CoinKey {
+    if (this.encypted) {
+      throw new Error("Locked. Please unlock to continue.");
+    }
     return this._coinKey;
   }
 
   public toHDPrivateKey(): typeof HDKey {
+    if (this.encypted) {
+      throw new Error("Mnemonic is encrypted");
+    }
     const _seed = this.toHexString();
 
     const hDPrivateKey = HDKey.fromMasterSeed(
@@ -89,10 +101,16 @@ export class Mnemonic {
    * @returns string
    */
   public toString(): string {
+    if (this.encypted) {
+      throw new Error("Locked. Please unlock to continue.");
+    }
     return this._mnemonic;
   }
 
   public toHexString(): string {
+    if (this.encypted) {
+      throw new Error("Locked. Please unlock to continue.");
+    }
     if (!this._seed) {
       throw new Error("Seed not available or encrypted");
     }
@@ -117,6 +135,9 @@ export class Mnemonic {
    * Deep cloned object of the wallet.
    */
   public inspect(): Inspect {
+    if (this.encypted) {
+      throw new Error("Locked. Please unlock to continue.");
+    }
     return structuredClone({
       hdKey: this._hdKey,
       coinKey: this._coinKey,
@@ -133,7 +154,18 @@ export class Mnemonic {
     });
   }
 
+  public async lock(passphrase?: string) {
+    return this.encrypt(passphrase);
+  }
+
+  public async unlock(passphrase?: string) {
+    return this.decrypt(passphrase);
+  }
+
   public async encrypt(passphrase?: string) {
+    if (this.encypted) {
+      throw new Error("Already locked. Please unlock to continue.");
+    }
     const p = passphrase || "";
     this._hdKey = await encrypt(p, this._hdKey);
     this._coinKey = await encrypt(p, this._coinKey);
@@ -147,6 +179,9 @@ export class Mnemonic {
   }
 
   public async decrypt(passphrase?: string) {
+    if (!this.encypted) {
+      throw new Error("Unlocked. Please lock to continue.");
+    }
     const p = passphrase || "";
     this._coinKey = await decrypt(p, this._coinKey);
     if (this._passphrase) {
@@ -173,6 +208,9 @@ export class Mnemonic {
    * @return {GenerateAddressSet}
    */
   public generateAddresses(params: GenerateAddresses): GenerateAddressSet[] {
+    if (this.encypted) {
+      throw new Error("Locked. Please unlock to continue.");
+    }
     const _index =
       typeof params?.index === "number" ? Math.abs(params.index) : 0;
 
@@ -218,6 +256,9 @@ export class Mnemonic {
    * @returns {Address}
    */
   public generateAddress(path: string): Address {
+    if (this.encypted) {
+      throw new Error("Locked. Please unlock to continue.");
+    }
     const derived = this._hdKey.derive(path);
     const ck = new CoinKey(derived.privateKey, this._network.versions);
 
