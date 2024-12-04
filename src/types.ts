@@ -92,5 +92,4 @@ export type Inspect = {
   words: string | string[];
   hexString?: string;
   entropy?: string;
-  encrypted: boolean;
 };

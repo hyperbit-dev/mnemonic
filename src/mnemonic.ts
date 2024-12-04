@@ -24,7 +24,7 @@ export class Mnemonic {
   private _network: MainNet | TestNet | RegTest | SimNet;
   private _seed?: Buffer;
   private _words: string | string[];
-  public encypted: boolean = false;
+  public encrypted: boolean = false;
 
   constructor(options: Options = {}) {
     this._network = options?.network ?? btc.mainnet;
@@ -48,7 +48,7 @@ export class Mnemonic {
   }
 
   public toSeed(options: ToSeedOptions): Buffer {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Locked. Please unlock to continue.");
     }
     const mn = options.mnemonic || this._mnemonic;
@@ -69,21 +69,21 @@ export class Mnemonic {
   }
 
   public getHDPrivateKey(): typeof HDKey {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Locked. Please unlock to continue.");
     }
     return this._hdKey;
   }
 
   public getCoinKey(): CoinKey {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Locked. Please unlock to continue.");
     }
     return this._coinKey;
   }
 
   public toHDPrivateKey(): typeof HDKey {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Mnemonic is encrypted");
     }
     const _seed = this.toHexString();
@@ -101,14 +101,14 @@ export class Mnemonic {
    * @returns string
    */
   public toString(): string {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Locked. Please unlock to continue.");
     }
     return this._mnemonic;
   }
 
   public toHexString(): string {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Locked. Please unlock to continue.");
     }
     if (!this._seed) {
@@ -135,7 +135,7 @@ export class Mnemonic {
    * Deep cloned object of the wallet.
    */
   public inspect(): Inspect {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Locked. Please unlock to continue.");
     }
     return structuredClone({
@@ -146,11 +146,10 @@ export class Mnemonic {
       network: this._network,
       seed: this._seed,
       words: this._words,
-      hexString: !this.encypted ? this.toHexString() : undefined,
-      // entropy: !this.encypted
+      hexString: !this.encrypted ? this.toHexString() : undefined,
+      // entropy: !this.encrypted
       //   ? bip39.mnemonicToEntropy(this._mnemonic as string)
       //   : undefined,
-      encrypted: this.encypted,
     });
   }
 
@@ -163,7 +162,7 @@ export class Mnemonic {
   }
 
   public async encrypt(passphrase?: string) {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Already locked. Please unlock to continue.");
     }
     const p = passphrase || "";
@@ -175,11 +174,11 @@ export class Mnemonic {
     this._mnemonic = await encrypt(p, this._mnemonic);
     this._seed = this._seed = undefined;
     this._words = await encrypt(p, this._words);
-    this.encypted = true;
+    this.encrypted = true;
   }
 
   public async decrypt(passphrase?: string) {
-    if (!this.encypted) {
+    if (!this.encrypted) {
       throw new Error("Unlocked. Please lock to continue.");
     }
     const p = passphrase || "";
@@ -188,15 +187,15 @@ export class Mnemonic {
       this._passphrase = (await decrypt(p, this._passphrase)) as string;
     }
     this._mnemonic = (await decrypt(p, this._mnemonic)) as string;
+    if (this._words) {
+      this._words = (await decrypt(p, this._words as string)) as string[];
+    }
+    this.encrypted = false;
     this._seed = this.toSeed({
       mnemonic: this._mnemonic,
       passphrase: this._passphrase,
     });
-    if (this._words) {
-      this._words = (await decrypt(p, this._words as string)) as string[];
-    }
     this._hdKey = this.toHDPrivateKey();
-    this.encypted = false;
   }
 
   /**
@@ -208,7 +207,7 @@ export class Mnemonic {
    * @return {GenerateAddressSet}
    */
   public generateAddresses(params: GenerateAddresses): GenerateAddressSet[] {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Locked. Please unlock to continue.");
     }
     const _index =
@@ -256,7 +255,7 @@ export class Mnemonic {
    * @returns {Address}
    */
   public generateAddress(path: string): Address {
-    if (this.encypted) {
+    if (this.encrypted) {
       throw new Error("Locked. Please unlock to continue.");
     }
     const derived = this._hdKey.derive(path);
