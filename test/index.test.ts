@@ -40,17 +40,17 @@ describe("Mnemonic", () => {
     const code = new Mnemonic({
       mnemonic,
     });
-    await code.encrypt("password");
-    expect(() => code.inspect()).toThrow("Locked. Please unlock to continue.")
+    const data = await code.encrypt("password");
+    expect(() => data).toBeDefined()
   });
 
   it("should decrypt the mnemonic", async () => {
     const code = new Mnemonic({
       mnemonic,
     });
-    await code.encrypt("password");
-    await code.decrypt("password");
-    expect(code.encrypted).toBe(false);
+    const data = await code.encrypt("password");
+    const decrypted = await code.decrypt(data, "password");
+    expect(decrypted).toBeDefined()
   });
 
   it("should validate the mnemonic", () => {

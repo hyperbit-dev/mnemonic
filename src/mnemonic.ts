@@ -12,6 +12,7 @@ import {
   ToSeedOptions,
   Language,
   Inspect,
+  EncryptedObject,
 } from "./types";
 
 export class Mnemonic {
@@ -24,7 +25,6 @@ export class Mnemonic {
   private _network: MainNet | TestNet | RegTest | SimNet;
   private _seed?: Buffer;
   private _words: string | string[];
-  public encrypted: boolean = false;
 
   constructor(options: Options = {}) {
     this._network = options?.network ?? btc.mainnet;
@@ -48,9 +48,6 @@ export class Mnemonic {
   }
 
   public toSeed(options: ToSeedOptions): Buffer {
-    if (this.encrypted) {
-      throw new Error("Locked. Please unlock to continue.");
-    }
     const mn = options.mnemonic || this._mnemonic;
     const p = options.passphrase || this._passphrase;
     if (mn) {
@@ -69,23 +66,14 @@ export class Mnemonic {
   }
 
   public getHDPrivateKey(): typeof HDKey {
-    if (this.encrypted) {
-      throw new Error("Locked. Please unlock to continue.");
-    }
     return this._hdKey;
   }
 
   public getCoinKey(): CoinKey {
-    if (this.encrypted) {
-      throw new Error("Locked. Please unlock to continue.");
-    }
     return this._coinKey;
   }
 
   public toHDPrivateKey(): typeof HDKey {
-    if (this.encrypted) {
-      throw new Error("Mnemonic is encrypted");
-    }
     const _seed = this.toHexString();
 
     const hDPrivateKey = HDKey.fromMasterSeed(
@@ -101,18 +89,12 @@ export class Mnemonic {
    * @returns string
    */
   public toString(): string {
-    if (this.encrypted) {
-      throw new Error("Locked. Please unlock to continue.");
-    }
     return this._mnemonic;
   }
 
   public toHexString(): string {
-    if (this.encrypted) {
-      throw new Error("Locked. Please unlock to continue.");
-    }
     if (!this._seed) {
-      throw new Error("Seed not available or encrypted");
+      throw new Error("Seed not available");
     }
     return this._seed.toString("hex");
   }
@@ -135,9 +117,6 @@ export class Mnemonic {
    * Deep cloned object of the wallet.
    */
   public inspect(): Inspect {
-    if (this.encrypted) {
-      throw new Error("Locked. Please unlock to continue.");
-    }
     return structuredClone({
       hdKey: this._hdKey,
       coinKey: this._coinKey,
@@ -146,56 +125,45 @@ export class Mnemonic {
       network: this._network,
       seed: this._seed,
       words: this._words,
-      hexString: !this.encrypted ? this.toHexString() : undefined,
-      // entropy: !this.encrypted
-      //   ? bip39.mnemonicToEntropy(this._mnemonic as string)
-      //   : undefined,
+      hexString: this.toHexString(),
+      entropy: bip39.mnemonicToEntropy(this._mnemonic as string),
     });
   }
 
-  public async lock(passphrase?: string) {
-    return this.encrypt(passphrase);
+  /**
+   * Return an encrypted object of the internal data.
+   */
+  public async encrypt(passphrase?: string): Promise<EncryptedObject> {
+    return {
+      hdkey: await encrypt(passphrase || "", this._hdKey),
+      coinKey: await encrypt(passphrase || "", this._coinKey),
+      passphrase: this._passphrase
+        ? await encrypt(passphrase || "", this._passphrase)
+        : undefined,
+      mnemonic: await encrypt(passphrase || "", this._mnemonic),
+      words: await encrypt(passphrase || "", this._words),
+    };
   }
 
-  public async unlock(passphrase?: string) {
-    return this.decrypt(passphrase);
-  }
-
-  public async encrypt(passphrase?: string) {
-    if (this.encrypted) {
-      throw new Error("Already locked. Please unlock to continue.");
-    }
+  /**
+   * Decrypt a copy of the internal data from an external source
+   */
+  public async decrypt(value: string | EncryptedObject, passphrase: string) {
     const p = passphrase || "";
-    this._hdKey = await encrypt(p, this._hdKey);
-    this._coinKey = await encrypt(p, this._coinKey);
-    if (this._passphrase) {
-      this._passphrase = await encrypt(p, this._passphrase);
-    }
-    this._mnemonic = await encrypt(p, this._mnemonic);
-    this._seed = this._seed = undefined;
-    this._words = await encrypt(p, this._words);
-    this.encrypted = true;
-  }
 
-  public async decrypt(passphrase?: string) {
-    if (!this.encrypted) {
-      throw new Error("Unlocked. Please lock to continue.");
+    if (typeof value === "string") {
+      return decrypt(p, value);
     }
-    const p = passphrase || "";
-    this._coinKey = await decrypt(p, this._coinKey);
-    if (this._passphrase) {
-      this._passphrase = (await decrypt(p, this._passphrase)) as string;
-    }
-    this._mnemonic = (await decrypt(p, this._mnemonic)) as string;
-    if (this._words) {
-      this._words = (await decrypt(p, this._words as string)) as string[];
-    }
-    this.encrypted = false;
-    this._seed = this.toSeed({
-      mnemonic: this._mnemonic,
-      passphrase: this._passphrase,
-    });
-    this._hdKey = this.toHDPrivateKey();
+
+    return {
+      hdkey: await decrypt(p, value.hdkey),
+      coinKey: await decrypt(p, value.coinKey),
+      passphrase: value.passphrase
+        ? ((await decrypt(p, value.passphrase)) as string)
+        : undefined,
+      mnemonic: (await decrypt(p, value.mnemonic)) as string,
+      words: value.words ? ((await decrypt(p, value.words)) as string[]) : [],
+    };
   }
 
   /**
@@ -207,9 +175,6 @@ export class Mnemonic {
    * @return {GenerateAddressSet}
    */
   public generateAddresses(params: GenerateAddresses): GenerateAddressSet[] {
-    if (this.encrypted) {
-      throw new Error("Locked. Please unlock to continue.");
-    }
     const _index =
       typeof params?.index === "number" ? Math.abs(params.index) : 0;
 
@@ -256,9 +221,6 @@ export class Mnemonic {
    * @returns {Address}
    */
   public generateAddress(path: string): Address {
-    if (this.encrypted) {
-      throw new Error("Locked. Please unlock to continue.");
-    }
     const derived = this._hdKey.derive(path);
     const ck = new CoinKey(derived.privateKey, this._network.versions);
 
