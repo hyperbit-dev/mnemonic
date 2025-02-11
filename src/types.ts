@@ -93,3 +93,11 @@ export type Inspect = {
   hexString?: string;
   entropy?: string;
 };
+
+export type EncryptedObject = {
+  hdkey: string;
+  coinKey: string;
+  passphrase?: string;
+  mnemonic: string;
+  words: string;
+}
