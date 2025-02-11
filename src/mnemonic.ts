@@ -244,6 +244,7 @@ export class Mnemonic {
 
   /**
    * Generate a single address for external or change.
+   * m / purpose' / coin_type' / account' / change / address_ind
    *
    * @example
    * // First Wallet Receive Address
