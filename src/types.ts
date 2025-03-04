@@ -1,4 +1,4 @@
-import { MainNet, TestNet, RegTest, SimNet } from "@hyperbitjs/chains";
+import { Network, Versions } from "@hyperbitjs/chains";
 import CoinKey from "@hyperbitjs/coinkey";
 import HDKey from "@hyperbitjs/hdkey";
 
@@ -27,6 +27,10 @@ export type Language =
   | "portuguese"
   | "chinese_traditional";
 
+export type MnemonicNetwork = Omit<Network, "MainNetBasic"> & {
+  versions: Versions;
+};
+
 export type Options = {
   /**
    * Set of strings that will generate private and public keys for wallet/address.
@@ -40,7 +44,7 @@ export type Options = {
    * import { btc } from '@hyperbitjs/chains';
    * new Mnemonic({network: btc.mainnet});
    */
-  network?: MainNet | TestNet | RegTest | SimNet;
+  network?: MnemonicNetwork;
   /**
    * Additional word/string to securely your mnemonic string.
    */
@@ -87,7 +91,7 @@ export type Inspect = {
   coinKey: CoinKey;
   passphrase?: string;
   mnemonic: string;
-  network: MainNet | TestNet | RegTest | SimNet;
+  network: MnemonicNetwork;
   seed?: Buffer;
   words: string | string[];
   hexString?: string;
@@ -100,4 +104,4 @@ export type EncryptedObject = {
   passphrase?: string;
   mnemonic: string;
   words: string;
-}
+};
