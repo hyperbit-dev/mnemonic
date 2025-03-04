@@ -58,7 +58,7 @@
     "vitest": "^1.1.3"
   },
   "dependencies": {
-    "@hyperbitjs/chains": "^1.7.0",
+    "@hyperbitjs/chains": "^1.10.2",
     "@hyperbitjs/coinkey": "^0.1.0",
     "@hyperbitjs/hdkey": "^0.1.1",
     "@metamask/browser-passworder": "^5.0.1",

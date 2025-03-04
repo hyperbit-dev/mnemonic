@@ -1,4 +1,4 @@
-import { btc, MainNet, TestNet, RegTest, SimNet } from "@hyperbitjs/chains";
+import { btc } from "@hyperbitjs/chains";
 import CoinKey from "@hyperbitjs/coinkey";
 import HDKey from "@hyperbitjs/hdkey";
 import { encrypt, decrypt } from "@metamask/browser-passworder";
@@ -13,6 +13,7 @@ import {
   Language,
   Inspect,
   EncryptedObject,
+  MnemonicNetwork,
 } from "./types";
 
 export class Mnemonic {
@@ -22,12 +23,12 @@ export class Mnemonic {
 
   private _mnemonic: string;
   private _language: Language;
-  private _network: MainNet | TestNet | RegTest | SimNet;
+  private _network: MnemonicNetwork;
   private _seed?: Buffer;
   private _words: string | string[];
 
   constructor(options: Options = {}) {
-    this._network = options?.network ?? btc.mainnet;
+    this._network = options?.network as MnemonicNetwork ?? btc.mainnet;
     this._language = options.language ?? "english";
 
     bip39.setDefaultWordlist(this._language);
