@@ -1,17 +1,11 @@
 {
   "name": "@hyperbitjs/mnemonic",
-  "version": "3.3.0",
-  "type": "module",
-  "author": "Hyperbit <support@hyperbit.app>",
+  "version": "4.0.0",
   "license": "MIT",
-  "homepage": "https://github.com/hyperbit-dev/mnemonic#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperbit-dev/mnemonic.git"
-  },
-  "bugs": "https://github.com/hyperbit-dev/mnemonic/issues",
-  "keywords": [],
-  "sideEffects": false,
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -19,56 +13,54 @@
       "require": "./dist/index.cjs"
     }
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      "*": [
-        "./dist/*",
-        "./dist/index.d.ts"
-      ]
-    }
-  },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
-  "scripts": {
-    "build": "unbuild",
-    "dev": "unbuild --stub",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix",
-    "prepublishOnly": "npm run build",
-    "release": "bumpp && npm publish",
-    "start": "esno src/index.ts",
-    "test": "vitest",
-    "typecheck": "tsc --noEmit"
+  "engines": {
+    "node": ">=16"
   },
-  "devDependencies": {
-    "@types/hdkey": "^2.0.3",
-    "@types/node": "^20.11.16",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "bumpp": "^9.2.1",
-    "eslint": "^8.56.0",
-    "esno": "^4.0.0",
-    "typescript": "^5.3.3",
-    "unbuild": "^2.0.0",
-    "vite": "^5.0.11",
-    "vitest": "^1.1.3"
+  "scripts": {
+    "build": "vite build",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix && prettier --write .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "validate": "npm run type-check && npm run lint && npm run test",
+    "prepublishOnly": "npm run build && npm run validate"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hyperbit-dev/mnemonic.git"
+  },
+  "author": "Hyperbit",
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
-    "@hyperbitjs/chains": "^1.10.2",
-    "@hyperbitjs/coinkey": "^0.1.0",
-    "@hyperbitjs/hdkey": "^0.1.1",
-    "@metamask/browser-passworder": "^5.0.1",
-    "bip39": "^3.1.0"
+    "bip39": "^3.1.0",
+    "@hyperbitjs/chains": "workspace:*",
+    "@hyperbitjs/coinkey": "workspace:*",
+    "@hyperbitjs/hdkey": "workspace:*",
+    "@metamask/browser-passworder": "^4.0.0"
   },
-  "overrides": {
-    "braces": "^3.0.3",
-    "@cypress/request": "^3.0.0",
-    "deep-extend": "^0.5.1",
-    "minimist": "^1.2.3",
-    "request": "^3.0.0"
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.3.3",
+    "vite": "^5.4.21",
+    "vitest": "^1.6.1"
   }
 }
