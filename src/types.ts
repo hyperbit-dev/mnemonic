@@ -1,33 +1,33 @@
-import { Network, Versions } from "@hyperbitjs/chains";
-import CoinKey from "@hyperbitjs/coinkey";
-import HDKey from "@hyperbitjs/hdkey";
+import { Network, Versions } from '@hyperbitjs/chains';
+import CoinKey from '@hyperbitjs/coinkey';
+import HDKey from '@hyperbitjs/hdkey';
 
 export const languages: Record<Language, { name: string; label: string }> = {
-  chinese_simplified: { name: "Chinese Simplified", label: "简体中文" },
-  english: { name: "English", label: "English" },
-  japanese: { name: "Japanese", label: "日本語" },
-  spanish: { name: "Spanish", label: "Español" },
-  italian: { name: "Italian", label: "Italiano" },
-  french: { name: "French", label: "Français" },
-  korean: { name: "Korean", label: "한국어" },
-  czech: { name: "Czech", label: "Čeština" },
-  portuguese: { name: "Portuguese", label: "Português" },
-  chinese_traditional: { name: "Chinese Traditional", label: "繁體中文" },
+  chinese_simplified: { name: 'Chinese Simplified', label: '简体中文' },
+  english: { name: 'English', label: 'English' },
+  japanese: { name: 'Japanese', label: '日本語' },
+  spanish: { name: 'Spanish', label: 'Español' },
+  italian: { name: 'Italian', label: 'Italiano' },
+  french: { name: 'French', label: 'Français' },
+  korean: { name: 'Korean', label: '한국어' },
+  czech: { name: 'Czech', label: 'Čeština' },
+  portuguese: { name: 'Portuguese', label: 'Português' },
+  chinese_traditional: { name: 'Chinese Traditional', label: '繁體中文' },
 };
 
 export type Language =
-  | "chinese_simplified"
-  | "english"
-  | "japanese"
-  | "spanish"
-  | "italian"
-  | "french"
-  | "korean"
-  | "czech"
-  | "portuguese"
-  | "chinese_traditional";
+  | 'chinese_simplified'
+  | 'english'
+  | 'japanese'
+  | 'spanish'
+  | 'italian'
+  | 'french'
+  | 'korean'
+  | 'czech'
+  | 'portuguese'
+  | 'chinese_traditional';
 
-export type MnemonicNetwork = Omit<Network, "MainNetBasic"> & {
+export type MnemonicNetwork = Omit<Network, 'MainNetBasic'> & {
   versions: Versions;
 };
 
@@ -39,7 +39,7 @@ export type Options = {
    */
   mnemonic?: string;
   /**
-   * Network object cotaining information about the blockchain. See [@hyperbitjs/chains](https://github.com/hyperbit-dev/chains).
+   * Network object containing information about the blockchain. See [@hyperbitjs/chains](https://github.com/hyperbit-dev/chains).
    * @example
    * import { btc } from '@hyperbitjs/chains';
    * new Mnemonic({network: btc.mainnet});
@@ -56,9 +56,16 @@ export type Options = {
   /**
    * @deprecated
    * https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki#account
-   * Default = 0 for discoverying all wallet addresses starting from the root.
+   * Default = 0 for discovering all wallet addresses starting from the root.
    */
   account?: number;
+  /**
+   * Entropy strength in bits for mnemonic generation (128-256, divisible by 32).
+   * Default is 128 (12 words). Use 256 for 24 words.
+   * @example
+   * new Mnemonic({ strength: 256 }); // Generates 24-word mnemonic
+   */
+  strength?: number;
 };
 
 export type ToSeedOptions = {
@@ -87,13 +94,13 @@ export type Address = {
 };
 
 export type Inspect = {
-  hdKey: typeof HDKey;
+  hdKey: HDKey;
   coinKey: CoinKey;
   passphrase?: string;
   mnemonic: string;
   network: MnemonicNetwork;
   seed?: Buffer;
-  words: string | string[];
+  words: string[];
   hexString?: string;
   entropy?: string;
 };
