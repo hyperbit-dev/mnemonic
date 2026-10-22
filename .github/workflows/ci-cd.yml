@@ -8,6 +8,10 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+  id-token: write
+
 jobs:
   test:
     name: Test & Quality
