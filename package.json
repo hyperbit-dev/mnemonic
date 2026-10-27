@@ -51,7 +51,7 @@
     "@hyperbitjs/chains": "^2.0.2",
     "@hyperbitjs/coinkey": "^4.0.1",
     "@hyperbitjs/hdkey": "^1.0.1",
-    "@metamask/browser-passworder": "^4.0.0"
+    "@metamask/browser-passworder": "^6.0.0"
   },
   "overrides": {
     "@hyperbitjs/coinkey": {
